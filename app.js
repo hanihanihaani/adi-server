@@ -1,47 +1,29 @@
 const express = require('express');
 const path = require('path');
-// const favicon = require('serve-favicon');
+const favicon = require('serve-favicon');
 const logger = require('morgan');
+const nunjucks = require("nunjucks");
+
+// session
+const session = require("express-session");
+const MongoStore = require('connect-mongo')(session);
+const mongoose = require("mongoose");
+
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-
-//session
-const session = require("express-session");
-const mongoose = require("mongoose");
-const MongoStore = require("connect-mongo")(session);
-const fs = require("fs");
-
-const index = require('./routes/index');
-const signup = require('./routes/signup');
-const login = require('./routes/login');
-const logout = require('./routes/logout');
 const app = express();
 
-// view engine setup
+const index = require('./routes/index');
+const manage = require("./routes/manage/index");
+const upload = require("./routes/upload");
+const shoppingCart = require('./routes/shoppingCart');
+const contact = require("./routes/contact");
 
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'html');
-
-// uncomment after placing your favicon in /public
-
-
-// 配置文件日志
-const cLogger = logger.format("clogger",
-  ":date[iso] :: :user-agent :: :remote-addr :: :method :: :url :: :status :: :response-time ms");
-const logPath = __dirname + "/logs";
-const accessLogFile = fs.createWriteStream(logPath + "/access.log", {flags: "a"});
-app.use(logger('clogger',{
-  stream: accessLogFile
-}));
-
-
-
-// 配置session
 app.use(session({
-  // store: new MongoStore({
-  //  mongooseConnection: mongoose.connection
-  // }),
+  store: new MongoStore({
+	mongooseConnection: mongoose.connection
+  }),
   name: "Carp",
   secret: "123345ljgaotu09354u0",
   cookie: {maxAge: 60*60*1000},
@@ -57,25 +39,45 @@ app.use(session({
   saveUninitialized: false,
 }))
 
-app.use(function(req,res,next){
-  res.append("Access-Control-Allow-Origin", "http://localhost:3001");
-  res.append("Access-Control-Allow-Headers", "Content-Type");
-  res.append("Access-Control-Allow-Credentials", true);
-  next();
+// view engine setup
+nunjucks.configure("views", {
+  autoescape: true,
+  express: app,
 })
+app.set('view engine', 'html');
 
+// uncomment after placing your favicon in /public
+app.use(logger('dev'));
 
-// app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+// app.set('view engine', 'jade');
+
+// uncomment after placing your favicon in /public
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//if (app.get("env") === "development") {
+  app.use(function(req, res, next) {
+  //  if (process.env.SERVER) {
+ 	  res.append("Access-Control-Allow-Origin", "http://localhost:3001");
+    //} else {
+ 	  //res.append("Access-Control-Allow-Origin", "http://localhost:3000");
+    //} 
+ 	res.append("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");
+ 	res.append("Access-Control-Allow-Credentials", true);
+ 	res.append("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+ 	next();
+  });
+//}
+
 app.use('/', index);
-app.use('/signup',signup);
-app.use('/login',login);
-app.use('/logout',logout);
+app.use("/manage", manage);
+app.use("/upload", upload);
+app.use("/shoppingcart", shoppingCart);
+app.use("/contact", contact);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -86,13 +88,16 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
   // render the error page
-  //res.status(err.status || 500);
-  res.render('error');
+  if (app.get("env") === "development") {
+	next(err)
+  } else {
+	// set locals, only providing error in development
+	res.locals.message = err.message;
+	res.locals.error = req.app.get('env') === 'development' ? err : {};
+	res.status(err.status || 500);
+	res.render('error');
+  }
 });
 
 module.exports = app;

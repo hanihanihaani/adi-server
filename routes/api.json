@@ -1,0 +1,381 @@
+[
+  {
+    "name": "注册",
+    "router": "/signup",
+    "method": "POST",
+    "body": {
+      "username": "string",
+      "password": "string",
+      "captcha": "string",
+      "phone": "string",
+      "email": "string"
+    },
+    "response": {
+      "OK": "bool",
+      "user": {
+        "username": "string",
+        "_id": "string",
+        "createAt": "Datetime"
+      }
+    }
+  },
+  {
+    "name": "登录",
+    "router": "/login",
+    "method": "POST",
+    "body": {
+      "username": "string",
+      "password": "string",
+      "captcha": "string"
+    },
+    "response": {
+      "OK": "bool",
+      "user": {
+        "username": "string",
+        "_id": "string",
+        "createAt": "Datetime"
+      }
+    }
+  },
+  {
+    "name": "退出",
+    "router": "/logout",
+    "method": "GET",
+    "response": {
+      "OK": "bool"
+    }
+  },
+  {
+    "name": "获取验证码",
+    "router": "/captcha",
+    "method": "GET",
+    "response": {
+      "OK": "bool",
+      "captcha": "string"
+    }
+  },
+  {
+    "name": "分类管理",
+    "router": "/manage/cetagory",
+    "children": [
+      {
+        "name": "获取全部分类",
+        "method": "GET",
+        "response": {
+          "OK": "bool",
+          "docs": "array[object]"
+        }
+      },
+      {
+        "name": "按等级获取分类",
+        "method": "GET",
+        "path": "/:level",
+        "response": {
+          "OK": "bool",
+          "docs": "array[object]"
+        }
+      },
+      {
+        "name": "新增分类",
+        "method": "POST",
+        "body": {
+          "name": "string",
+          "level": "number",
+          "children": "array[]"
+        },
+        "response": {
+          "OK": "bool"
+        }
+      },
+      {
+        "name": "修改分类",
+        "method": "PUT",
+        "body": {
+          "name": "string",
+          "level": "number",
+          "children": "array[]"
+        },
+        "response": {
+          "OK": "bool"
+        }
+      },
+      {
+        "name": "删除分类",
+        "method": "DELETE",
+        "path": "/:id",
+        "response": {
+          "OK": "bool"
+        }
+      }
+    ]
+  },
+  {
+    "name": "标签管理",
+    "router": "/manage/tag",
+    "children": [
+      {
+        "name": "获取全部标签",
+        "method": "GET",
+        "response": {
+          "OK": "bool",
+          "docs": "array[object]"
+        }
+      },
+      {
+        "name": "新增标签",
+        "method": "POST",
+        "body": {
+          "name": "string",
+          "primary": "number",
+          "children": "array[string]"
+        },
+        "response": {
+          "OK": "bool"
+        }
+      },
+      {
+        "name": "修改标签",
+        "method": "PUT",
+        "body": {
+          "name": "string",
+          "primary": "number",
+          "children": "array[string]"
+        },
+        "response": {
+          "OK": "bool"
+        }
+      },
+      {
+        "name": "删除标签",
+        "method": "DELETE",
+        "path": "/:id",
+        "response": {
+          "OK": "bool"
+        }
+      }
+    ]
+  },
+  {
+    "name": "商品管理",
+    "router": "/manage/product",
+    "children": [
+      {
+        "name": "按条件查找商品",
+        "method": "GET",
+        "path": "query",
+        "response": {
+          "OK": "bool",
+          "docs": "array[object]"
+        }
+      },
+      {
+        "name": "按id获取单个商品",
+        "method": "GET",
+        "path": "/:id",
+        "response": {
+          "OK": "bool",
+          "doc": {
+            "_id": "string",
+            "name": "string",
+            "description": "string",
+            "price": "number",
+            "storage": "number",
+            "category": "string",
+            "unit": "string",
+            "tag": "array[string]",
+            "images": "array[string]",
+            "createAt": "datetime",
+            "info": "string",
+            "status": "bool"
+          }
+        }
+      },
+      {
+        "name": "新增商品",
+        "method": "POST",
+        "body": {
+          "name": "string",
+          "description": "string",
+          "price": "number",
+          "storage": "number",
+          "category": "string",
+          "unit": "string",
+          "images": "array[string]",
+          "tag": "array[string]",
+          "info": "string",
+          "status": "bool"
+        },
+        "response": {
+          "OK": "bool"
+        }
+      },
+      {
+        "name": "修改商品",
+        "method": "PUT",
+        "body": {
+          "name": "string",
+          "description": "string",
+          "price": "number",
+          "storage": "number",
+          "category": "string",
+          "unit": "string",
+          "images": "array[string]",
+          "tag": "array[string]",
+          "info": "string",
+          "status": "bool"
+        },
+        "response": {
+          "OK": "bool"
+        }
+      },
+      {
+        "name": "删除商品",
+        "method": "DELETE",
+        "path": "/:id",
+        "response": {
+          "OK": "bool"
+        }
+      }
+    ]
+  },
+  {
+    "name": "购物车管理",
+    "router": "/shoppingcart",
+    "children": [
+      {
+        "name": "获取购物车",
+        "method": "GET",
+        "response": {
+          "OK": "bool",
+          "docs": "array[object]",
+          "docs-object": {
+            "_id": "objectId",
+            "num": "number",
+            "product": "productObj"
+          }
+        }
+      },
+      {
+        "name": "添加购物车",
+        "method": "POST",
+        "body": {
+          "type": "Array",
+          "pid": "ObjectId",
+          "num": "number"
+        },
+        "response": {
+          "OK": "bool"
+        }
+      },
+      {
+        "name": "删除购物车商品",
+        "method": "DELETE",
+        "path": "/:id",
+        "response": {
+          "OK": "bool"
+        }
+      }
+    ]
+  },
+  {
+    "name": "联系人管理",
+    "router": "/contact",
+    "children": [
+      {
+        "name": "获取全部联系人",
+        "method": "GET",
+        "response": {
+          "OK": "bool",
+          "docs": "array[object]",
+          "docs-object": {
+            "_id": "objectId",
+            "contact": "string",
+            "phone": "string",
+            "address": "string",
+            "default": "bool",
+            "createAt": "time"
+          }
+        }
+      },
+      {
+        "name": "增加联系人",
+        "method": "POST",
+        "body": {
+          "contact": "string",
+          "phone": "string",
+          "address": "string",
+          "default": "bool"
+        },
+        "response": {
+          "OK": "bool",
+          "docs": "array[object]",
+          "docs-object": {
+            "_id": "objectId",
+            "contact": "string",
+            "phone": "string",
+            "address": "string",
+            "default": "bool",
+            "createAt": "time"
+          }
+        }
+      },
+      {
+        "name": "修改联系人",
+        "method": "PUT",
+        "body": {
+          "id": "objectId",
+          "contact": "string",
+          "phone": "string",
+          "address": "string",
+          "default": "bool"
+        },
+        "response": {
+          "OK": "bool",
+          "docs": "array[object]",
+          "docs-object": {
+            "_id": "objectId",
+            "contact": "string",
+            "phone": "string",
+            "address": "string",
+            "default": "bool",
+            "createAt": "time"
+          }
+        }
+      },
+      {
+        "name": "删除联系人",
+        "method": "DELETE",
+        "path": "/:id",
+        "response": {
+          "OK": "bool",
+          "docs": "array[object]",
+          "docs-object": {
+            "_id": "objectId",
+            "contact": "string",
+            "phone": "string",
+            "address": "string",
+            "default": "bool",
+            "createAt": "time"
+          }
+        }
+      },
+      {
+        "name": "设置默认联系人",
+        "method": "GET",
+        "path": "/:id",
+        "response": {
+          "OK": "bool",
+          "docs": "array[object]",
+          "docs-object": {
+            "_id": "objectId",
+            "contact": "string",
+            "phone": "string",
+            "address": "string",
+            "default": "bool",
+            "createAt": "time"
+          }
+        }
+      }
+    ]
+  }
+]
